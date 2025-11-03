@@ -71,7 +71,7 @@
         <a id="btn2" class="link-btn secondary" href="#" role="button" aria-label="Open dev">Open dev</a>
       </div>
 
-      <p class="note">Supports clipboard paste and auto-save. When opening a custom scheme the browser may prompt or nothing may happen — in that case you'll see a hint.</p>
+      <p class="note">Supports clipboard paste and auto-save. Long-press buttons to copy links.</p>
     </div>
   </div>
 
@@ -145,60 +145,28 @@
         showToast('Reset');
       });
 
-      // Open link with fallback detection
+      // Open link - simplified
       function openWithFallback(url){
-        // If http/https — just navigate
         try{
-          const scheme = (url.split(':')[0] || '').toLowerCase();
-          if(scheme === 'http' || scheme === 'https'){
-            window.location.href = url;
-            return;
-          }
-        }catch(e){}
-
-        let opened = false;
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        // timeout: if app not opened — show hint
-        const start = Date.now();
-        let timer = setTimeout(()=>{
-          if(!document.hidden && Date.now() - start > 1200){
-            showToast('App did not open. Long-press the button to copy the link.');
-          }
-          cleanup();
-        }, 1200);
-
-        function cleanup(){
-          clearTimeout(timer);
-          if(iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        }
-
-        function onVisibility(){
-          if(document.hidden){
-            opened = true;
-            cleanup();
-          }
-        }
-
-        document.addEventListener('visibilitychange', onVisibility);
-        try{
-          iframe.src = url;
-          document.body.appendChild(iframe);
+          window.location.href = url;
         }catch(e){
-          try{ window.location.href = url; }catch(_){ }
+          showToast('Cannot open link: ' + e.message);
         }
-
-        setTimeout(()=>{ document.removeEventListener('visibilitychange', onVisibility); cleanup(); }, 2500);
       }
 
-      // Long press to copy link (mobile friendly)
+      // Long press to copy link
       function attachLongPress(el, getUrl){
         let pressTimer = null;
-        const onStart = (e)=>{
+        const onStart = ()=>{
           pressTimer = setTimeout(()=>{
             const url = getUrl();
-            navigator.clipboard?.writeText(url).then(()=> showToast('Link copied to clipboard'))
-              .catch(()=> showToast('Copy failed'));
+            if(navigator.clipboard && navigator.clipboard.writeText){
+              navigator.clipboard.writeText(url)
+                .then(()=> showToast('Link copied'))
+                .catch(()=> showToast('Copy failed'));
+            } else {
+              showToast('Clipboard not supported');
+            }
           }, 500);
         };
         const onEnd = ()=>{ clearTimeout(pressTimer); };
