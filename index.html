@@ -2,41 +2,74 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Deep Link Buttons</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Deep Link Buttons (mobile)</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; display:flex; flex-direction:column; gap:16px; align-items:center; justify-content:flex-start; padding:40px; margin:0; background:#f7f7f7; }
-    .row { display:flex; gap:12px; align-items:center; }
-    label { font-weight:600; min-width:140px; }
-    input[type="text"] { padding:8px 10px; border-radius:6px; border:1px solid #ddd; width:320px; }
-    .btn { display:inline-block; padding:12px 18px; background:#2563eb; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; }
-    .btn.secondary { background:#0ea5a4; }
-    .controls { display:flex; gap:8px; }
-    button { padding:8px 12px; border-radius:8px; border:0; background:#374151; color:#fff; cursor:pointer; }
-    button.ghost { background:#e5e7eb; color:#111; }
-    .links { display:flex; gap:12px; margin-top:8px; }
+    :root{--bg:#f7f7f7;--card:#fff;--primary:#2563eb;--accent:#0ea5a4;--muted:#6b7280}
+    html,body{height:100%;margin:0}
+    body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); display:flex; align-items:flex-start; justify-content:center; padding:20px 16px; }
+    .wrap{width:100%;max-width:720px}
+    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    h1{font-size:18px;margin:0 0 8px}
+    p.lead{margin:0 0 12px;color:var(--muted);font-size:13px}
+
+    .field{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .field .label{min-width:86px;font-weight:600;font-size:14px}
+    .field input[type="text"]{flex:1;padding:12px 12px;border-radius:10px;border:1px solid #e5e7eb;font-size:15px}
+    .field button.small{padding:10px 12px;border-radius:10px;border:0;background:#f3f4f6;color:#111;font-weight:600;cursor:pointer}
+
+    .controls{display:flex;gap:8px;margin-bottom:12px}
+    .controls button{flex:1;padding:12px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700;color:#fff}
+    .controls .save{background:var(--primary)}
+    .controls .reset{background:#374151}
+
+    .links{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+    .link-btn{display:inline-flex;align-items:center;justify-content:center;padding:14px;border-radius:12px;background:var(--primary);color:#fff;text-decoration:none;font-weight:800;font-size:16px}
+    .link-btn.secondary{background:var(--accent)}
+
+    .note{margin-top:12px;color:var(--muted);font-size:13px}
+
+    /* toast */
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;background:rgba(0,0,0,0.85);color:#fff;padding:10px 14px;border-radius:10px;font-size:14px;display:none;z-index:1200}
+    .toast.show{display:block;animation:toastIn .22s ease}
+    @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+    @media(min-width:880px){body{padding:40px}h1{font-size:20px}}
   </style>
 </head>
 <body>
-  <div class="row">
-    <label for="link1">Схема 1</label>
-    <input id="link1" type="text" placeholder="atb360://open-banking/callback" />
+  <div class="wrap">
+    <div class="card" role="main">
+      <h1>Deep Link — мобильная версия</h1>
+      <p class="lead">Изменяйте и открывайте схемы прямо с телефона. Если приложение не установлено — получите подсказку и сможете скопировать ссылку.</p>
+
+      <div class="field">
+        <div class="label">Схема 1</div>
+        <input id="link1" type="text" inputmode="url" autocomplete="off" placeholder="atb360://open-banking/callback" aria-label="Схема 1" />
+        <button class="small" id="paste1" title="Вставить из буфера">📋</button>
+      </div>
+
+      <div class="field">
+        <div class="label">Схема 2</div>
+        <input id="link2" type="text" inputmode="url" autocomplete="off" placeholder="atb360dev://open-banking/callback" aria-label="Схема 2" />
+        <button class="small" id="paste2" title="Вставить из буфера">📋</button>
+      </div>
+
+      <div class="controls">
+        <button id="save" class="save">Сохранить</button>
+        <button id="reset" class="reset">Сбросить</button>
+      </div>
+
+      <div class="links">
+        <a id="btn1" class="link-btn" href="#" role="button" aria-label="Открыть первую схему">Open</a>
+        <a id="btn2" class="link-btn secondary" href="#" role="button" aria-label="Открыть вторую схему">Open</a>
+      </div>
+
+      <p class="note">Поддерживается вставка из буфера и автоматическое сохранение. При попытке открыть кастомную схему браузер может показать подтверждение или ничего не произойдёт — в этом случае появится подсказка.</p>
+    </div>
   </div>
 
-  <div class="row">
-    <label for="link2">Схема 2</label>
-    <input id="link2" type="text" placeholder="atb360dev://open-banking/callback" />
-  </div>
-
-  <div class="row controls">
-    <button id="save">Сохранить</button>
-    <button id="reset" class="ghost">Сбросить</button>
-  </div>
-
-  <div class="links">
-    <a id="btn1" class="btn" href="#" role="button">Open atb360</a>
-    <a id="btn2" class="btn secondary" href="#" role="button">Open atb360dev</a>
-  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
     (function(){
@@ -48,14 +81,24 @@
       const btn2 = document.getElementById('btn2');
       const save = document.getElementById('save');
       const reset = document.getElementById('reset');
+      const paste1 = document.getElementById('paste1');
+      const paste2 = document.getElementById('paste2');
+      const toast = document.getElementById('toast');
 
-      function load() {
+      function showToast(text, ms = 3500){
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(()=>{toast.classList.remove('show')}, ms);
+      }
+
+      function load(){
         inp1.value = localStorage.getItem('link1') || DEFAULT_1;
         inp2.value = localStorage.getItem('link2') || DEFAULT_2;
         apply();
       }
 
-      function apply() {
+      function apply(){
         const v1 = inp1.value.trim() || DEFAULT_1;
         const v2 = inp2.value.trim() || DEFAULT_2;
         btn1.href = v1;
@@ -64,24 +107,121 @@
         btn2.textContent = 'Open ' + (v2.split(':')[0] || 'app');
       }
 
-      // Live update when typing
+      // Clipboard paste helpers
+      async function pasteInto(input){
+        try{
+          const text = await navigator.clipboard.readText();
+          if(text) { input.value = text; apply(); showToast('Вставлено из буфера'); }
+          else showToast('Буфер пуст');
+        }catch(e){
+          showToast('Не удалось получить доступ к буферу');
+        }
+      }
+
+      paste1.addEventListener('click', ()=> pasteInto(inp1));
+      paste2.addEventListener('click', ()=> pasteInto(inp2));
+
+      // Live update
       inp1.addEventListener('input', apply);
       inp2.addEventListener('input', apply);
 
-      save.addEventListener('click', () => {
+      save.addEventListener('click', ()=>{
         localStorage.setItem('link1', inp1.value.trim());
         localStorage.setItem('link2', inp2.value.trim());
         apply();
+        showToast('Сохранено');
       });
 
-      reset.addEventListener('click', () => {
+      reset.addEventListener('click', ()=>{
         localStorage.removeItem('link1');
         localStorage.removeItem('link2');
         load();
+        showToast('Сброшено');
       });
+
+      // Open link with fallback detection
+      function openWithFallback(url){
+        // Если это http/https — просто перейти
+        try{
+          const scheme = (url.split(':')[0] || '').toLowerCase();
+          if(scheme === 'http' || scheme === 'https'){
+            window.location.href = url;
+            return;
+          }
+        }catch(e){}
+
+        let opened = false;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        // timeout: если приложение не открылось — покажем подсказку
+        const start = Date.now();
+        let timer = setTimeout(()=>{
+          // если документ не скрыт — значит приложение не открылось
+          if(!document.hidden && Date.now() - start > 1200){
+            showToast('Приложение не запущено. Нажмите и удерживайте кнопку, чтобы скопировать ссылку.');
+          }
+          cleanup();
+        }, 1200);
+
+        function cleanup(){
+          clearTimeout(timer);
+          if(iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        }
+
+        // Если страница станет скрыта — пользователь перешёл в приложение -> не показываем тост
+        function onVisibility(){
+          if(document.hidden){
+            opened = true;
+            cleanup();
+          }
+        }
+
+        document.addEventListener('visibilitychange', onVisibility);
+        // Попытка открыть схему через iframe
+        try{
+          iframe.src = url;
+          document.body.appendChild(iframe);
+        }catch(e){
+          // как fallback пробуем менять location
+          try{ window.location.href = url; }catch(_){ }
+        }
+
+        // Очистка через пару секунд
+        setTimeout(()=>{ document.removeEventListener('visibilitychange', onVisibility); cleanup(); }, 2500);
+      }
+
+      // Long press to copy link (mobile friendly)
+      function attachLongPress(el, getUrl){
+        let pressTimer = null;
+        const onStart = (e)=>{
+          pressTimer = setTimeout(()=>{
+            const url = getUrl();
+            navigator.clipboard?.writeText(url).then(()=> showToast('Ссылка скопирована в буфер'))
+              .catch(()=> showToast('Не удалось скопировать'));
+          }, 500);
+        };
+        const onEnd = ()=>{ clearTimeout(pressTimer); };
+        el.addEventListener('touchstart', onStart);
+        el.addEventListener('mousedown', onStart);
+        el.addEventListener('touchend', onEnd);
+        el.addEventListener('mouseup', onEnd);
+        el.addEventListener('mouseleave', onEnd);
+      }
+
+      // Attach listeners to buttons
+      btn1.addEventListener('click', function(e){ e.preventDefault(); openWithFallback(this.href); });
+      btn2.addEventListener('click', function(e){ e.preventDefault(); openWithFallback(this.href); });
+
+      attachLongPress(btn1, ()=>btn1.href);
+      attachLongPress(btn2, ()=>btn2.href);
 
       // init
       load();
+
+      // Accessibility: allow Enter on inputs to open link for convenience
+      inp1.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') { openWithFallback(inp1.value.trim() || DEFAULT_1); } });
+      inp2.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') { openWithFallback(inp2.value.trim() || DEFAULT_2); } });
+
     })();
   </script>
 </body>
