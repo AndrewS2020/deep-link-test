@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Deep Links (mobile)</title>
   <style>
-    :root{--bg:#f7f7f7;--card:#fff;--primary:#2563eb;--accent:#0ea5a4;--muted:#6b7280}
+    :root{--bg:#f7f7f7;--card:#fff;--primary:#2563eb;--accent:#eab308;--muted:#6b7280}
     html,body{height:100%;margin:0}
     body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); display:flex; align-items:flex-start; justify-content:center; padding:20px 16px; }
     .wrap{width:100%;max-width:720px}
@@ -19,11 +19,6 @@
     .inputrow{display:flex;gap:8px;align-items:center}
     .inputrow input[type="text"]{flex:1;padding:12px 12px;border-radius:10px;border:1px solid #e5e7eb;font-size:15px}
     .inputrow button.small{padding:10px 12px;border-radius:10px;border:0;background:#f3f4f6;color:#111;font-weight:600;cursor:pointer}
-
-    .controls{display:flex;gap:8px;margin-bottom:12px}
-    .controls button{flex:1;padding:12px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:700;color:#fff}
-    .controls .save{background:var(--primary)}
-    .controls .reset{background:#374151}
 
     .links{display:flex;flex-direction:column;gap:10px;margin-top:4px}
     .link-btn{display:inline-flex;align-items:center;justify-content:center;padding:14px;border-radius:12px;background:var(--primary);color:#fff;text-decoration:none;font-weight:800;font-size:16px}
@@ -61,17 +56,13 @@
         </div>
       </div>
 
-      <div class="controls">
-        <button id="save" class="save">Save</button>
-        <button id="reset" class="reset">Reset</button>
-      </div>
 
       <div class="links">
         <a id="btn1" class="link-btn" href="#" role="button" aria-label="Open prod">Open prod</a>
         <a id="btn2" class="link-btn secondary" href="#" role="button" aria-label="Open dev">Open dev</a>
       </div>
 
-      <p class="note">Supports clipboard paste and auto-save. Long-press buttons to copy links.</p>
+      <p class="note">Auto-saves changes. Paste from clipboard with 📋. Long-press buttons to copy links.</p>
     </div>
   </div>
 
@@ -85,8 +76,6 @@
       const inp2 = document.getElementById('link2');
       const btn1 = document.getElementById('btn1');
       const btn2 = document.getElementById('btn2');
-      const save = document.getElementById('save');
-      const reset = document.getElementById('reset');
       const paste1 = document.getElementById('paste1');
       const paste2 = document.getElementById('paste2');
       const toast = document.getElementById('toast');
@@ -111,13 +100,20 @@
         btn2.href = v2;
         btn1.textContent = 'Open prod';
         btn2.textContent = 'Open dev';
+        // Auto-save to localStorage
+        localStorage.setItem('link1', v1);
+        localStorage.setItem('link2', v2);
       }
 
       // Clipboard paste helpers
       async function pasteInto(input){
         try{
           const text = await navigator.clipboard.readText();
-          if(text) { input.value = text; apply(); showToast('Pasted from clipboard'); }
+          if(text) { 
+            input.value = text; 
+            apply(); 
+            showToast('Pasted');
+          }
           else showToast('Clipboard is empty');
         }catch(e){
           showToast('Cannot access clipboard');
@@ -127,23 +123,10 @@
       paste1.addEventListener('click', ()=> pasteInto(inp1));
       paste2.addEventListener('click', ()=> pasteInto(inp2));
 
-      // Live update
+      // Live update and auto-save
       inp1.addEventListener('input', apply);
       inp2.addEventListener('input', apply);
 
-      save.addEventListener('click', ()=>{
-        localStorage.setItem('link1', inp1.value.trim());
-        localStorage.setItem('link2', inp2.value.trim());
-        apply();
-        showToast('Saved');
-      });
-
-      reset.addEventListener('click', ()=>{
-        localStorage.removeItem('link1');
-        localStorage.removeItem('link2');
-        load();
-        showToast('Reset');
-      });
 
       // Open link - simplified
       function openWithFallback(url){
