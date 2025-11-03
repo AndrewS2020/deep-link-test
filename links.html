@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Deep Link Buttons</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; display:flex; flex-direction:column; gap:16px; align-items:center; justify-content:flex-start; padding:40px; margin:0; background:#f7f7f7; }
+    .row { display:flex; gap:12px; align-items:center; }
+    label { font-weight:600; min-width:140px; }
+    input[type="text"] { padding:8px 10px; border-radius:6px; border:1px solid #ddd; width:320px; }
+    .btn { display:inline-block; padding:12px 18px; background:#2563eb; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; }
+    .btn.secondary { background:#0ea5a4; }
+    .controls { display:flex; gap:8px; }
+    button { padding:8px 12px; border-radius:8px; border:0; background:#374151; color:#fff; cursor:pointer; }
+    button.ghost { background:#e5e7eb; color:#111; }
+    .links { display:flex; gap:12px; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <label for="link1">Схема 1</label>
+    <input id="link1" type="text" placeholder="atb360://open-banking/callback" />
+  </div>
+
+  <div class="row">
+    <label for="link2">Схема 2</label>
+    <input id="link2" type="text" placeholder="atb360dev://open-banking/callback" />
+  </div>
+
+  <div class="row controls">
+    <button id="save">Сохранить</button>
+    <button id="reset" class="ghost">Сбросить</button>
+  </div>
+
+  <div class="links">
+    <a id="btn1" class="btn" href="#" role="button">Open atb360</a>
+    <a id="btn2" class="btn secondary" href="#" role="button">Open atb360dev</a>
+  </div>
+
+  <script>
+    (function(){
+      const DEFAULT_1 = "atb360://open-banking/callback";
+      const DEFAULT_2 = "atb360dev://open-banking/callback";
+      const inp1 = document.getElementById('link1');
+      const inp2 = document.getElementById('link2');
+      const btn1 = document.getElementById('btn1');
+      const btn2 = document.getElementById('btn2');
+      const save = document.getElementById('save');
+      const reset = document.getElementById('reset');
+
+      function load() {
+        inp1.value = localStorage.getItem('link1') || DEFAULT_1;
+        inp2.value = localStorage.getItem('link2') || DEFAULT_2;
+        apply();
+      }
+
+      function apply() {
+        const v1 = inp1.value.trim() || DEFAULT_1;
+        const v2 = inp2.value.trim() || DEFAULT_2;
+        btn1.href = v1;
+        btn2.href = v2;
+        btn1.textContent = 'Open ' + (v1.split(':')[0] || 'app');
+        btn2.textContent = 'Open ' + (v2.split(':')[0] || 'app');
+      }
+
+      // Live update when typing
+      inp1.addEventListener('input', apply);
+      inp2.addEventListener('input', apply);
+
+      save.addEventListener('click', () => {
+        localStorage.setItem('link1', inp1.value.trim());
+        localStorage.setItem('link2', inp2.value.trim());
+        apply();
+      });
+
+      reset.addEventListener('click', () => {
+        localStorage.removeItem('link1');
+        localStorage.removeItem('link2');
+        load();
+      });
+
+      // init
+      load();
+    })();
+  </script>
+</body>
+</html>
